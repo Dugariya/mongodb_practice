@@ -2,7 +2,12 @@ const express = require("express");
 const userRoute = express.Router();
 const multer = require("multer");
 const User = require("../models/users");
-const { loginController } = require("../controller/user.controller");
+const {
+  loginController,
+  logoutUser,
+  refreshAccessToken,
+} = require("../controller/user.controller");
+const { verifyJWT } = require("../middlewares/auth.middleware");
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, "src/uploads/"); // Folder where images will be stored
@@ -23,6 +28,11 @@ userRoute.get("/", (req, res) => {
 
 userRoute.post("/register", upload.single("profileImage"), async (req, res) => {
   try {
+    const _existUser = await User.findOne({ email: req.body.email });
+    if (_existUser) {
+      res.status(409).json({ message: "user already exist" });
+      return;
+    }
     let user = new User({
       name: req.body.name,
       email: req.body.email,
@@ -30,10 +40,14 @@ userRoute.post("/register", upload.single("profileImage"), async (req, res) => {
       password: req.body.password,
       profileImage: req.file ? req.file.originalname : "default_image.jpg",
     });
+
     let _res = await user.save();
+    const returnUser = await User.find({ _id: _res._id }).select(
+      "-password -refreshToken"
+    );
     res
       .status(201)
-      .json({ user: _res, message: "User registered successfully" });
+      .json({ user: returnUser, message: "User registered successfully" });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -64,5 +78,7 @@ userRoute.delete("/deleteAll", async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 });
-
+userRoute.post("/refresh-token", refreshAccessToken);
+//secure routes
+userRoute.post("/logout", verifyJWT, logoutUser);
 module.exports = userRoute;

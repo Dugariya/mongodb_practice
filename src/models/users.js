@@ -33,6 +33,9 @@ const userSchema = new mongoose.Schema(
       type: Map,
       of: String,
     },
+    refreshToken: {
+      type: String,
+    },
   },
   { timestamps: true }
 );
@@ -44,19 +47,19 @@ userSchema.pre("save", async function (next) {
 userSchema.methods.isPasswordCorrect = async function (password) {
   return await bcrypt.compare(password, this.password);
 };
-userSchema.methods.generateAccessTocken = function () {
+userSchema.methods.generateAccessToken = function () {
   var token = jwt.sign(
     { _id: this._id, name: this.name, email: this.email },
-    process.env.ACCESS_TOCKEN_SECRET,
-    { expiresIn: process.env.ACCESS_TOCKEN_EXPIRY }
+    process.env.ACCESS_TOKEN_SECRET,
+    { expiresIn: process.env.ACCESS_TOKEN_EXPIRY }
   );
   return token;
 };
-userSchema.methods.generateRefreshTocken = function () {
+userSchema.methods.generateRefreshToken = function () {
   var token = jwt.sign(
     { _id: this._id, name: this.name, email: this.email },
-    process.env.REFRESH_TOCKEN_SECRET,
-    { expiresIn: process.env.REFRESH_TOCKEN_EXPIRY }
+    process.env.REFRESH_TOKEN_SECRET,
+    { expiresIn: process.env.REFRESH_TOKEN_EXPIRY }
   );
   return token;
 };
