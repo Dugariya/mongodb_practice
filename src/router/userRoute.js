@@ -20,10 +20,14 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 // Get all items
-userRoute.get("/", (req, res) => {
-  User.find()
-    .then((items) => res.json(items))
-    .catch((err) => res.status(400).json("Errord : " + err));
+userRoute.get("/", async (req, res) => {
+  try {
+    // const usersWithPosts = await User.find().populate("postDetails");
+    const usersWithPosts = await User.find();
+    res.status(201).json(usersWithPosts);
+  } catch (error) {
+    res.status(400).json("Errord : " + err);
+  }
 });
 
 userRoute.post("/register", upload.single("profileImage"), async (req, res) => {

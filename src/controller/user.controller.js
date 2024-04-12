@@ -4,10 +4,11 @@ const jwt = require("jsonwebtoken");
 const loginController = async (req, res) => {
   try {
     const { email, password, userName } = req.body;
-    const user = await User.findOne({ $or: [{ email }, { userName }] });
+    const user = await User.findOne({ email });
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
+    console.log(user, "users");
     const isCorrect = await user.isPasswordCorrect(password);
     if (!isCorrect) {
       return res.status(401).json({ message: "Invalid password" });
