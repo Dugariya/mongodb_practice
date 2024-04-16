@@ -23,7 +23,10 @@ const upload = multer({ storage: storage });
 userRoute.get("/", async (req, res) => {
   try {
     // const usersWithPosts = await User.find().populate("postDetails");
-    const usersWithPosts = await User.find();
+    const usersWithPosts = await User.find().populate(
+      "polls",
+      "question option"
+    );
     res.status(201).json(usersWithPosts);
   } catch (error) {
     res.status(400).json("Errord : " + err);

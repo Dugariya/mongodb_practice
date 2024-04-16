@@ -37,6 +37,7 @@ const userSchema = new mongoose.Schema(
       type: String,
     },
     postDetails: [{ type: mongoose.Schema.Types.ObjectId, ref: "Post" }],
+    polls: [{ type: mongoose.Schema.Types.ObjectId, ref: "Poll" }],
   },
   { timestamps: true }
 );
