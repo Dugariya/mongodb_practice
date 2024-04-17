@@ -19,6 +19,14 @@ const pollSchema = new mongoose.Schema(
     },
     option: [optionSchema],
     voted: [{ type: mongoose.Schema.Types.ObjectId, ref: "user" }],
+    startTime: {
+      type: Date,
+      required: [true, "Poll start time is required"],
+    },
+    endTime: {
+      type: Date,
+      required: [true, "Poll end time is required"],
+    },
   },
   { timestamps: true }
 );
